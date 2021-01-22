@@ -10,11 +10,15 @@ public protocol Window {
     /// A NSImage value that contains the icon of application.
     var icon: NSImage? { get }
     
+    var iconPath: String? { get }
+    
     /// A String value that contains the application name.
     var applicationName: String? { get }
 }
 
 public struct WindowInfo: Window {
+    public let iconPath: String?
+    
     public let icon: NSImage?
     
     public let applicationName: String?

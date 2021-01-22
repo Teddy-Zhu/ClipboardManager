@@ -57,15 +57,33 @@ final class ClipboardChecker {
     
     /// Start the timer to check the system clipboard.
     private func start() {
-        timer = timerFactory.create(timeInterval: timeInterval,
-                                    repeats: true,
-                                    block: { [weak self] (_) in
-            self?.checkClipboard()
-        })
+        lastCopiedItem = clipboard.fetch()
+//        timer = timerFactory.create(timeInterval: timeInterval,
+//                                    repeats: true,
+//                                    block: { [weak self] (_) in
+//            self?.checkClipboard()
+//        })
+
+       timer = timerFactory.create(timeInterval: timeInterval, repeats: true, block: { [weak self] (_) in
+        self?.checkForChangesInPasteboard()
+       })
         
         RunLoop.main.add(timer as! Timer, forMode: .common)
     }
     
+    private let pasteboard = NSPasteboard.general
+
+    private var lastChangeCount: Int = NSPasteboard.general.changeCount
+
+    func checkForChangesInPasteboard() {
+        guard pasteboard.changeCount != lastChangeCount else {
+            return
+        }
+        lastChangeCount = pasteboard.changeCount
+        guard let item = clipboard.fetch() else { return }
+        delegate?.clipboardDidChanged(item: createClipboardItem(item))
+    }
+
     /// Check the system clipboard.
     func checkClipboard() {
         guard let item = clipboard.fetch() else { return }

@@ -21,10 +21,43 @@ class WindowManager {
     private var contentProvider: ContentProvider
     
     var windowInfo: WindowInfo {
-        return WindowInfo(icon: applicationIcon(),
-                          applicationName: applicationName())
+        return getWinInfo()
     }
     
+    func getWinInfo() -> WindowInfo {
+        guard let pid = getActiveWindowPid() else { return WindowInfo(iconPath: nil, icon: nil, applicationName: nil) }
+        
+        contentProvider.setPid(pid_t(pid))
+        
+        let path = contentProvider.getPath()
+        let plistPath = contentProvider.getPlistPath(path)
+        let iconPath :String? = getIconPath(plistPath: plistPath,path: path)
+        
+        let appName :String? = getAppName(plistPath: plistPath)
+    
+        return WindowInfo(iconPath: iconPath,icon: nil, applicationName: appName)
+    }
+    
+    func getIconPath(plistPath:String?,path:String?) -> String? {
+        if let dict = NSDictionary(contentsOf: URL(fileURLWithPath: plistPath!)) {
+            guard let iconName = dict["CFBundleIconFile"] as? String else {
+                return nil
+            }
+            return path! + "/Resources/" + ( iconName.hasSuffix(".icns") ? iconName: (iconName + ".icns") )
+        }
+        
+        return nil
+    }
+    
+    func getAppName(plistPath:String?) -> String? {
+        if let dict = NSDictionary(contentsOf: URL(fileURLWithPath: plistPath!)) {
+            guard let name = dict["CFBundleName"] as? String else { return nil }
+            return name
+        }
+        return nil
+    }
+    
+
     static let shared = WindowManager()
     
     // MARK: Initialization
@@ -65,7 +98,7 @@ class WindowManager {
                 return nil
             }
             
-            let iconPath = path! + "/Resources/" + iconName + ".icns"
+            let iconPath = path! + "/Resources/" + ( iconName.hasSuffix(".icns") ? iconName: (iconName + ".icns") )
             return NSImage(contentsOfFile: iconPath)
         }
         
