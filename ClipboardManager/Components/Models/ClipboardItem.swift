@@ -26,9 +26,8 @@ public struct ClipboardItem: Item {
 }
 
 extension ClipboardItem {
-    init(window: Window, pasteboardItem: NSPasteboardItem) {
-        let content = ClipboardContent(item: pasteboardItem,
-                                       date: Date())
+    init(window: Window, pasteboardItems: [NSPasteboardItem]) {
+        let content = ClipboardContent(items: pasteboardItems)
         self.init(window: window, content: content)
     }
 }

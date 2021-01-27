@@ -80,26 +80,25 @@ final class ClipboardChecker {
             return
         }
         lastChangeCount = pasteboard.changeCount
-        guard let item = clipboard.fetch() else { return }
-        delegate?.clipboardDidChanged(item: createClipboardItem(item))
+        delegate?.clipboardDidChanged(item: createClipboardItem(pasteboard.pasteboardItems!))
     }
 
     /// Check the system clipboard.
-    func checkClipboard() {
-        guard let item = clipboard.fetch() else { return }
-        
-        if lastCopiedItem == nil || lastCopiedItem != item {
-            lastCopiedItem = item
-            delegate?.clipboardDidChanged(item: createClipboardItem(item))
-        }
-    }
-    
+//    func checkClipboard() {
+//        guard let item = clipboard.fetch() else { return }
+//
+//        if lastCopiedItem == nil || lastCopiedItem != item {
+//            lastCopiedItem = item
+//            delegate?.clipboardDidChanged(item: createClipboardItem(item))
+//        }
+//    }
+//
     /// Create an instance of the ClipboardItem.
     ///
     /// - Parameter values: A tuple with data and type of content.
     /// - Returns: ClipboardItem instance.
-    private func createClipboardItem(_ item: NSPasteboardItem) -> ClipboardItem {
+    private func createClipboardItem(_ items: [NSPasteboardItem]) -> ClipboardItem {
         return ClipboardItem(window: WindowManager.shared.windowInfo,
-                             pasteboardItem: item)
+                             pasteboardItems: items)
     }
 }

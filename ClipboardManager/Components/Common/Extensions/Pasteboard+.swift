@@ -16,11 +16,11 @@ public protocol PasteboardEngine {
 extension NSPasteboard: PasteboardEngine {
     @discardableResult
     public func write(object: ClipboardItem) -> Bool {
-        guard let item = object.content.pasteboardItem else {
+        guard let item = object.content.pasteboardItems else {
             return false
         }
         
-        return writeObjects([item])
+        return writeObjects(item)
     }
     
     @discardableResult
